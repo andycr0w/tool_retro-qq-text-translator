@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="把普通中文翻译成 2006–2012 年 QQ 聊天、个性签名和非主流网名。">
+  <title>莪の发言翻译器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="desktop-grain" aria-hidden="true"></div>
+  <main class="page-shell">
+    <header class="site-intro">
+      <p class="year-stamp">2006—2012 / QQ MEMORY</p>
+      <h1><span>莪</span>の发言翻译器</h1>
+      <p>不是随机撒符号。先把语气送回那个年代，再火星化。</p>
+    </header>
+
+    <section class="qq-window" aria-labelledby="window-title">
+      <div class="qq-titlebar">
+        <div class="qq-mark" aria-hidden="true"><span>Q</span></div>
+        <div class="title-copy">
+          <strong id="window-title">与「火星翻译官」交谈中</strong>
+          <span>莪の世界，伱卟懂</span>
+        </div>
+        <div class="window-actions" aria-hidden="true"><span>—</span><span>□</span><span>×</span></div>
+      </div>
+
+      <div class="qq-toolbar" aria-label="连接状态">
+        <span class="online-dot"></span>
+        <strong id="connection-status">在线</strong>
+        <span class="toolbar-separator"></span>
+        <span>QQ 2008 怀旧线路</span>
+        <span class="toolbar-time" id="toolbar-time">23:59</span>
+      </div>
+
+      <div class="workspace">
+        <section class="conversation-panel" aria-labelledby="output-title">
+          <div class="panel-heading">
+            <span id="output-title">对方正在输入…</span>
+            <span class="panel-note">本地翻译 · 不上传文字</span>
+          </div>
+          <div class="output-area" id="output-area" aria-live="polite">
+            <div class="empty-state" id="empty-state">
+              <span class="empty-avatar" aria-hidden="true">火</span>
+              <div>
+                <strong>等待一条地球消息</strong>
+                <p>写下原文，翻译官会把它送回 2008 年。</p>
+              </div>
+            </div>
+          </div>
+          <div class="output-actions">
+            <span>提示：按 Ctrl + Enter 也可以翻译</span>
+            <button class="small-button" id="copy-button" type="button" hidden>复制结果</button>
+          </div>
+        </section>
+
+        <aside class="settings-panel" aria-label="翻译设置">
+          <fieldset class="control-group carrier-group">
+            <legend>发到哪里</legend>
+            <div class="segmented three-up">
+              <label><input type="radio" name="carrier" value="chat" checked><span>聊天发言</span></label>
+              <label><input type="radio" name="carrier" value="signature"><span>个性签名</span></label>
+              <label><input type="radio" name="carrier" value="nickname"><span>QQ网名</span></label>
+            </div>
+            <p class="field-hint" id="nickname-hint" hidden>建议输入 2–12 个字，一次生成 12 款。</p>
+          </fieldset>
+
+          <fieldset class="control-group">
+            <legend>空间人格</legend>
+            <div class="persona-list">
+              <label class="persona-card sorrow"><input type="radio" name="persona" value="sorrow"><span><b>伤感葬爱</b><small>伱永远卟会明白</small></span></label>
+              <label class="persona-card sweet"><input type="radio" name="persona" value="sweet"><span><b>甜蜜网恋</b><small>寶，要壹直陪莪</small></span></label>
+              <label class="persona-card cool"><input type="radio" name="persona" value="cool"><span><b>拽酷宣言</b><small>莪の世界无需解释</small></span></label>
+              <label class="persona-card daily"><input type="radio" name="persona" value="daily" checked><span><b>日常聊天</b><small>诶，就醬吖 = =</small></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="control-group" id="intensity-group">
+            <legend>火星浓度</legend>
+            <div class="segmented intensity-control">
+              <label><input type="radio" name="intensity" value="low"><span>轻度</span></label>
+              <label><input type="radio" name="intensity" value="standard" checked><span>标准</span></label>
+              <label><input type="radio" name="intensity" value="high"><span>爆表</span></label>
+            </div>
+            <div class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+          </fieldset>
+        </aside>
+
+        <form class="composer" id="translator-form">
+          <div class="composer-tools" aria-hidden="true">
+            <span class="font-tool">A</span><span>☺</span><span>✦</span><span>♫</span>
+            <span class="tool-spacer"></span><span>消息记录</span>
+          </div>
+          <label class="sr-only" for="source-text">输入原文</label>
+          <textarea id="source-text" maxlength="500" placeholder="在这里输入一句普通话…"></textarea>
+          <div class="composer-footer">
+            <span class="char-count" id="char-count">0 / 500</span>
+            <div class="secondary-actions">
+              <button type="button" class="text-button" id="example-button">来个例子</button>
+              <button type="button" class="text-button" id="clear-button">清空</button>
+            </div>
+            <button type="submit" class="send-button" id="generate-button">开始翻译</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span>纯浏览器运行</span><span>·</span><span>无账号</span><span>·</span><span>无 API</span>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="vocabulary.js"></script>
+  <script src="app.js"></script>
+  <script>document.getElementById("toolbar-time").textContent = new Date().toLocaleTimeString("zh-CN", {hour:"2-digit", minute:"2-digit"});</script>
+</body>
+</html>
