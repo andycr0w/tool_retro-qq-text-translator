@@ -194,11 +194,9 @@
     signature: { emptyTitle: "个性签名还是空的", emptyCopy: "写下一句话，生成你的空间签名。" },
     nickname: { emptyTitle: "还没有非主流网名", emptyCopy: "输入一个名字，看看它在 2008 年的样子。" }
   };
-  const examples = {
-    chat: ["你怎么还不回我消息，我有点生气了。", "我今天不想上班，只想回家睡觉。", "我还是忘不了你，但是不会再联系你了。"],
-    signature: ["我还是忘不了你，但是不会再联系你了。", "不是所有的等待，都能等到一个结果。", "有些人一旦错过，就不在。"],
-    nickname: ["蓝翔吕姐", "寂寞小雨", "冷酷少年"]
-  };
+  const examples = Object.fromEntries(
+    Object.entries(L.exampleCorpus).map(([carrier, entries]) => [carrier, entries.map(({ text }) => text)])
+  );
   const exampleIndex = { chat: 0, signature: 0, nickname: 0 };
   let activeCarrier = "chat";
   let seedCounter = Date.now();

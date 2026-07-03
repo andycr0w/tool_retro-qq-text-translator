@@ -3,6 +3,11 @@
 
   const phraseRules = {
     common: [
+      ["我倒", ["莪倒", "偶倒", "莪倒嘞"]],
+      ["我晕", ["莪暈", "偶暈", "暈死莪ㄋ"]],
+      ["你是", ["伱媞", "伱是"]],
+      ["还是", ["還媞", "還是"]],
+      ["偶稀饭你", ["偶稀飯伱", "偶眞の稀飯伱"]],
       ["怎么还不回我消息", ["怎麼還不回莪消息", "怎麼還卟回消息", "爲什麼壹直卟理莪"]],
       ["不会再联系你了", ["卟會侢聯繫伱ㄋ", "以後卟會侢打擾伱ㄋ"]],
       ["不会再联系", ["卟會侢聯繫", "卟會侢打擾"]],
@@ -124,12 +129,65 @@
     ["ヤPk", "°│"], ["←═╬∞", "~"], ["★°", "ツ︶"], ["ゞ", "ミ"]
   ];
 
+  const exampleCorpus = {
+    chat: [
+      { year: 2006, text: "我倒，你是GG还是MM？" },
+      { year: 2006, text: "我晕，你怎么还不回我消息？" },
+      { year: 2006, text: "偶稀饭你，可以加个QQ吗？" },
+      { year: 2006, text: "先下了，886。" },
+      { year: 2007, text: "这个回答很好很强大。" },
+      { year: 2007, text: "做人要厚道，顶一个。" },
+      { year: 2007, text: "今天抢到沙发了，哈哈。" },
+      { year: 2007, text: "你太有才了，偶像啊。" },
+      { year: 2008, text: "关我什么事，我只是来打酱油的。" },
+      { year: 2008, text: "这也太雷人了，我囧。" },
+      { year: 2008, text: "不要迷恋山寨，山寨只是传说。" },
+      { year: 2008, text: "今天你偷菜了吗？" },
+      { year: 2009, text: "贾君鹏，你妈妈喊你回家吃饭。" },
+      { year: 2009, text: "哥吃的不是面，是寂寞。" },
+      { year: 2009, text: "人生就是一张茶几，上面放满了杯具。" },
+      { year: 2009, text: "不要迷恋哥，哥只是个传说。" },
+      { year: 2010, text: "神马都是浮云，淡定。" },
+      { year: 2010, text: "这个回复太给力了。" },
+      { year: 2010, text: "最近鸭梨很大，有木有。" },
+      { year: 2010, text: "羡慕嫉妒恨啊。" },
+      { year: 2011, text: "这么坑爹的事情，伤不起啊！" },
+      { year: 2011, text: "咆哮体你们懂不懂啊，有木有！" },
+      { year: 2011, text: "淡定，我还hold得住。" },
+      { year: 2011, text: "亲，今天包邮哦。" },
+      { year: 2012, text: "元芳，这件事你怎么看？" },
+      { year: 2012, text: "我只是个屌丝，躺着也中枪。" },
+      { year: 2012, text: "高富帅和白富美都弱爆了。" },
+      { year: 2012, text: "你幸福吗？我姓曾。" }
+    ],
+    signature: [
+      { year: 2006, text: "偶稀饭你，但只敢偷偷看你的QQ空间。" },
+      { year: 2007, text: "做人要厚道，爱一个人也一样。" },
+      { year: 2008, text: "我不是雷人，我只是很囧。" },
+      { year: 2009, text: "哥写的不是签名，是寂寞。" },
+      { year: 2009, text: "人生是一张茶几，上面放满了杯具。" },
+      { year: 2010, text: "神马都是浮云，只有回忆是真的。" },
+      { year: 2011, text: "爱不起，更伤不起。" },
+      { year: 2012, text: "躺着也中枪，爱着也受伤。" }
+    ],
+    nickname: [
+      { year: 2006, text: "蓝翔吕姐" },
+      { year: 2007, text: "寂寞小雨" },
+      { year: 2008, text: "火星MM" },
+      { year: 2009, text: "杯具少年" },
+      { year: 2010, text: "浮云小子" },
+      { year: 2011, text: "伤不起" },
+      { year: 2012, text: "冷酷屌丝" }
+    ]
+  };
+
   root.MillenniumLexicon = Object.freeze({
     phraseRules,
     characterVariants,
     nicknameVariantCycles,
     personaVoices,
     signatureFrames,
-    nicknameFrames
+    nicknameFrames,
+    exampleCorpus
   });
 })(typeof window !== "undefined" ? window : globalThis);

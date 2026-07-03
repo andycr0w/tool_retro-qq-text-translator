@@ -34,6 +34,18 @@
     const messages = MillenniumTranslator.copyMessages;
     return messages.length === 4 && messages.every((message) => /[╭★━〣]/.test(message));
   });
+  test("示例语料覆盖 2006–2012", () => {
+    const years = new Set(MillenniumLexicon.exampleCorpus.chat.map(({ year }) => year));
+    return [2006, 2007, 2008, 2009, 2010, 2011, 2012].every((year) => years.has(year));
+  });
+  test("经典 QQ 聊天黑话已收录", () => {
+    const texts = MillenniumLexicon.exampleCorpus.chat.map(({ text }) => text).join("\n");
+    return ["我倒", "我晕", "GG", "MM", "886", "偶稀饭你"].every((word) => texts.includes(word));
+  });
+  test("GG、MM 与 886 保持可识别", () => {
+    const result = translate("我晕，你是GG还是MM？886。", { carrier: "chat", intensity: "high", seed: 2006 })[0];
+    return result.includes("GG") && result.includes("MM") && result.includes("886");
+  });
   function updateTitle() {
     document.title = failures ? `失败 ${failures} 项` : "全部测试通过";
   }
@@ -71,6 +83,13 @@
     test("字体设置作用于预览而不修改文本", () => input.style.getPropertyValue("--preview-font").includes("KaiTi") && input.value === "测^_^试");
     page.dispatchEvent(new win.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     test("Escape 关闭工具面板", () => page.querySelector("#appearance-panel").hidden);
+
+    const exampleButton = page.querySelector("#example-button");
+    input.value = "";
+    exampleButton.click();
+    const firstExample = input.value;
+    exampleButton.click();
+    test("来个例子会轮换年代语料", () => firstExample.includes("GG") && input.value !== firstExample);
 
     const signature = page.querySelector('input[name="carrier"][value="signature"]');
     signature.checked = true;
