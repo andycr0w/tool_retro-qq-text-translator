@@ -1,0 +1,24 @@
+# Local preview logs
+server*.log
+serve*.log
+
+# Local design references
+2004.jpg
+2005.jpg
+2006.jpg
+
+# Dependencies and test output
+node_modules/
+coverage/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating systems
+.DS_Store
+Thumbs.db
+Desktop.ini
