@@ -7,26 +7,30 @@
   const INTENSITY = {
     low: {
       voiceRate: 0.18,
-      layers: { traditional: 0.2, symbol: 0.08, shape: 0.03, split: 0, pinyin: 0 }
+      layers: { traditional: 0.24, symbol: 0.14, shape: 0.06, split: 0.01, pinyin: 0.04 },
+      texture: { spacer: 0.02, punctuation: 0.18, frame: 0.08, ornament: 0.01 }
     },
     standard: {
       voiceRate: 0.52,
-      layers: { traditional: 0.42, symbol: 0.22, shape: 0.12, split: 0.04, pinyin: 0.03 }
+      layers: { traditional: 0.48, symbol: 0.34, shape: 0.18, split: 0.06, pinyin: 0.16 },
+      texture: { spacer: 0.08, punctuation: 0.42, frame: 0.18, ornament: 0.035 }
     },
     high: {
       voiceRate: 0.88,
-      layers: { traditional: 0.58, symbol: 0.34, shape: 0.22, split: 0.1, pinyin: 0.06 }
+      layers: { traditional: 0.64, symbol: 0.48, shape: 0.3, split: 0.14, pinyin: 0.28 },
+      texture: { spacer: 0.16, punctuation: 0.66, frame: 0.34, ornament: 0.075 }
     }
   };
   const PERSONAS = ["translator", "sorrow", "sweet", "cool", "daily"];
 
   const GLYPH_LAYERS = [
-    ["traditional", "traditionalVariants"],
+    ["pinyin", "pinyinVariants"],
     ["symbol", "symbolVariants"],
+    ["traditional", "traditionalVariants"],
     ["shape", "shapeVariants"],
-    ["split", "splitVariants"],
-    ["pinyin", "pinyinVariants"]
+    ["split", "splitVariants"]
   ];
+  const SPACERS = [" ", "　", " 、 ", "﹏", " · "];
 
   function hashSeed(value) {
     let h = 2166136261 >>> 0;
@@ -87,13 +91,34 @@
     return result;
   }
 
+  function protectReplacement(value, protectedValues) {
+    const token = `§${protectedValues.length}§`;
+    protectedValues.push(value);
+    return token;
+  }
+
+  function applyProtectedPhraseRules(state, rules, random) {
+    if (!rules?.length) return state.value;
+    const sortedRules = [...rules].sort((a, b) => b[0].length - a[0].length);
+    let result = state.value;
+    for (const [source, replacements] of sortedRules) {
+      if (result.includes(source)) {
+        result = result.split(source).join(protectReplacement(pick(replacements, random), state.protectedValues));
+      }
+    }
+    state.value = result;
+    return result;
+  }
+
   function transformCharacter(char, profile, random) {
     const layers = profile.layers || INTENSITY.standard.layers;
+    const candidates = [];
     for (const [layerName, tableName] of GLYPH_LAYERS) {
       const variants = L[tableName]?.[char];
       const rate = layers[layerName] || 0;
-      if (variants && rate > 0 && random() < rate) return pick(variants, random);
+      if (variants && rate > 0 && random() < rate) candidates.push(...variants);
     }
+    if (candidates.length) return pick(candidates, random);
 
     const fallback = L.characterVariants?.[char];
     const fallbackRate = (layers.traditional || 0) * 0.35;
@@ -113,6 +138,64 @@
       result += insideToken ? char : transformCharacter(char, profile, random);
     }
     return result;
+  }
+
+  function canTakeSpacer(char) {
+    return /[\u4e00-\u9fffㄋの亽吢卟吥罘沵伱妳祢迩莪涐皒峩媞昰旳德]/u.test(char);
+  }
+
+  function textureText(text, profile, carrier, random) {
+    const texture = profile.texture || INTENSITY.standard.texture;
+    let result = "";
+    let insideToken = false;
+    let lastWasSpacer = false;
+    for (const char of text) {
+      if (char === "§") {
+        insideToken = !insideToken;
+        result += char;
+        lastWasSpacer = false;
+        continue;
+      }
+      if (insideToken) {
+        result += char;
+        continue;
+      }
+
+      const punctuation = L.punctuationVariants?.[char];
+      const rendered = punctuation && random() < texture.punctuation ? pick(punctuation, random) : char;
+      result += rendered;
+
+      if (
+        carrier !== "nickname" &&
+        canTakeSpacer(char) &&
+        !lastWasSpacer &&
+        random() < texture.spacer
+      ) {
+        result += pick(SPACERS, random);
+        lastWasSpacer = true;
+      } else {
+        lastWasSpacer = /\s|﹏|·|、/.test(rendered);
+      }
+
+      if (
+        carrier !== "nickname" &&
+        L.inlineSymbols?.length &&
+        (punctuation || canTakeSpacer(char)) &&
+        random() < texture.ornament
+      ) {
+        result += pick(L.inlineSymbols, random);
+      }
+    }
+    return result.replace(/[ \t]{2,}/g, " ");
+  }
+
+  function decorateNonMainstream(text, carrier, intensity, random) {
+    if (carrier === "nickname") return text;
+    const profile = INTENSITY[intensity] || INTENSITY.standard;
+    const frames = L.nonMainstreamFrames?.[carrier]?.[intensity] || [];
+    if (!frames.length || random() >= profile.texture.frame) return text;
+    const [start, end] = pick(frames, random);
+    return `${start}${text}${end}`;
   }
 
   function voiceText(text, persona, intensity, carrier, random) {
@@ -189,10 +272,13 @@
 
     const random = seededRandom(`${seed}:${carrier}:${persona}:${intensity}`);
     const protectedText = protectText(source);
+    applyProtectedPhraseRules(protectedText, L.phoneticPhraseRules, random);
     let result = applyPhraseRules(protectedText.value, persona, random);
     result = voiceText(result, persona, intensity, carrier, random);
     result = applyLayeredGlyphs(result, INTENSITY[intensity], random);
+    result = textureText(result, INTENSITY[intensity], carrier, random);
     result = restoreText(result, protectedText.protectedValues);
+    result = decorateNonMainstream(result, carrier, intensity, random);
     if (carrier === "signature") result = decorateSignature(result, intensity, random);
     return [safeOutput(result)];
   }

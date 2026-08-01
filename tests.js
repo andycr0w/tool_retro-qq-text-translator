@@ -63,6 +63,11 @@
     const result = translate("我晕，你是GG还是MM？886。", { carrier: "chat", intensity: "high", seed: 2006 })[0];
     return result.includes("GG") && result.includes("MM") && result.includes("886");
   });
+  test("高置信谐音短句稳定替换", () => {
+    const thanks = translate("感谢得五体投地", { carrier: "chat", intensity: "high", persona: "translator", seed: 2026 })[0];
+    const habit = translate("每天想念你，已成一种习惯", { carrier: "chat", intensity: "high", persona: "translator", seed: 2026 })[0];
+    return thanks.includes("3Q得orz") && habit.includes("莓兲想埝祢，巳宬1种漝惯");
+  });
   function updateTitle() {
     document.title = failures ? `失败 ${failures} 项` : "全部测试通过";
   }
