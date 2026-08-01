@@ -5,10 +5,28 @@
   if (!L) throw new Error("MillenniumLexicon 未加载");
 
   const INTENSITY = {
-    low: { glyphRate: 0.1, voiceRate: 0.18 },
-    standard: { glyphRate: 0.3, voiceRate: 0.52 },
-    high: { glyphRate: 0.55, voiceRate: 0.88 }
+    low: {
+      voiceRate: 0.18,
+      layers: { traditional: 0.2, symbol: 0.08, shape: 0.03, split: 0, pinyin: 0 }
+    },
+    standard: {
+      voiceRate: 0.52,
+      layers: { traditional: 0.42, symbol: 0.22, shape: 0.12, split: 0.04, pinyin: 0.03 }
+    },
+    high: {
+      voiceRate: 0.88,
+      layers: { traditional: 0.58, symbol: 0.34, shape: 0.22, split: 0.1, pinyin: 0.06 }
+    }
   };
+  const PERSONAS = ["translator", "sorrow", "sweet", "cool", "daily"];
+
+  const GLYPH_LAYERS = [
+    ["traditional", "traditionalVariants"],
+    ["symbol", "symbolVariants"],
+    ["shape", "shapeVariants"],
+    ["split", "splitVariants"],
+    ["pinyin", "pinyinVariants"]
+  ];
 
   function hashSeed(value) {
     let h = 2166136261 >>> 0;
@@ -69,7 +87,21 @@
     return result;
   }
 
-  function applyGlyphs(text, rate, random) {
+  function transformCharacter(char, profile, random) {
+    const layers = profile.layers || INTENSITY.standard.layers;
+    for (const [layerName, tableName] of GLYPH_LAYERS) {
+      const variants = L[tableName]?.[char];
+      const rate = layers[layerName] || 0;
+      if (variants && rate > 0 && random() < rate) return pick(variants, random);
+    }
+
+    const fallback = L.characterVariants?.[char];
+    const fallbackRate = (layers.traditional || 0) * 0.35;
+    if (fallback && random() < fallbackRate) return pick(fallback, random);
+    return char;
+  }
+
+  function applyLayeredGlyphs(text, profile, random) {
     let result = "";
     let insideToken = false;
     for (const char of text) {
@@ -78,17 +110,23 @@
         result += char;
         continue;
       }
-      const variants = L.characterVariants[char];
-      if (!insideToken && variants && random() < rate) {
-        result += pick(variants, random);
-      } else {
-        result += char;
-      }
+      result += insideToken ? char : transformCharacter(char, profile, random);
     }
     return result;
   }
 
   function voiceText(text, persona, intensity, carrier, random) {
+    if (persona === "translator") {
+      if (carrier !== "nickname") {
+        const frames = L.translatorFrames[intensity] || L.translatorFrames.standard;
+        const frameRate = intensity === "low" ? 0.08 : intensity === "high" ? 0.22 : 0.14;
+        if (random() < frameRate) {
+          const [start, end] = pick(frames, random);
+          return `${start}${text}${end}`;
+        }
+      }
+      return text;
+    }
     const voice = L.personaVoices[persona] || L.personaVoices.daily;
     const setting = INTENSITY[intensity] || INTENSITY.standard;
     let result = text;
@@ -113,16 +151,14 @@
 
   function transformNickname(text, candidateIndex, random, intensity) {
     const cycleIndex = candidateIndex % 6;
+    const profile = INTENSITY[intensity] || INTENSITY.high;
     let converted = "";
     for (const char of text.replace(/\s+/g, "")) {
       const cycle = L.nicknameVariantCycles[char];
-      const general = L.characterVariants[char];
       if (cycle) {
         converted += cycle[cycleIndex];
-      } else if (general && (intensity === "high" || random() < 0.58)) {
-        converted += general[(candidateIndex + Math.floor(random() * general.length)) % general.length];
       } else {
-        converted += char;
+        converted += transformCharacter(char, profile, random);
       }
     }
     const [start, end] = L.nicknameFrames[candidateIndex % L.nicknameFrames.length];
@@ -138,7 +174,7 @@
 
   function translate(text, options = {}) {
     const carrier = ["chat", "signature", "nickname"].includes(options.carrier) ? options.carrier : "chat";
-    const persona = ["sorrow", "sweet", "cool", "daily"].includes(options.persona) ? options.persona : "daily";
+    const persona = PERSONAS.includes(options.persona) ? options.persona : "daily";
     const intensity = ["low", "standard", "high"].includes(options.intensity) ? options.intensity : (carrier === "nickname" ? "high" : "standard");
     const source = cleanInput(text);
     if (!source) return [];
@@ -155,7 +191,7 @@
     const protectedText = protectText(source);
     let result = applyPhraseRules(protectedText.value, persona, random);
     result = voiceText(result, persona, intensity, carrier, random);
-    result = applyGlyphs(result, INTENSITY[intensity].glyphRate, random);
+    result = applyLayeredGlyphs(result, INTENSITY[intensity], random);
     result = restoreText(result, protectedText.protectedValues);
     if (carrier === "signature") result = decorateSignature(result, intensity, random);
     return [safeOutput(result)];
@@ -180,20 +216,29 @@
     example: $("#example-button"), toast: $("#toast"), personaGroup: $("#persona-group"),
     notebookPage: $("#notebook-page"), status: $("#connection-status"),
     intensityRange: $("#intensity-range"), signalMeter: $("#signal-meter"),
-    activeCopy: $("#active-copy-button"), font: $("#appearance-font"), size: $("#appearance-size")
+    activeCopy: $("#active-copy-button"), font: $("#appearance-font"), size: $("#appearance-size"),
+    taskTitle: $("#task-title"), profileSignatureButton: $("#profile-signature-button"),
+    profileSignatureText: $("#profile-signature-text")
   };
 
-  const defaultAppearance = () => ({ font: "song", size: 16, color: "#202830" });
+  const defaultAppearance = () => ({ font: "song", size: 14, color: "#000000" });
   const pages = {
-    chat: { draft: "", persona: "daily", intensity: "standard", history: [], appearance: defaultAppearance() },
-    signature: { draft: "", persona: "daily", intensity: "standard", result: "", appearance: defaultAppearance() },
+    chat: { draft: "", persona: "translator", intensity: "standard", history: [], appearance: defaultAppearance() },
+    signature: { draft: "", persona: "translator", intensity: "standard", result: "", appearance: defaultAppearance() },
     nickname: { draft: "", intensity: "high", results: [], appearance: defaultAppearance() }
   };
   const pageMeta = {
     chat: { emptyTitle: "等待一条地球消息", emptyCopy: "写下一句话，和火星翻译官聊聊。" },
-    signature: { emptyTitle: "个性签名还是空的", emptyCopy: "写下一句话，生成你的空间签名。" },
+    signature: { emptyTitle: "个性签名还是空的", emptyCopy: "写下一句话，生成你的个人签名。" },
     nickname: { emptyTitle: "还没有非主流网名", emptyCopy: "输入一个名字，看看它在 2008 年的样子。" }
   };
+  const friends = Object.freeze({
+    translator: { name: "火星文翻译官" },
+    sorrow: { name: "葬花♀涙" },
+    sweet: { name: "糖糖ゞ" },
+    cool: { name: "冷瞳╮" },
+    daily: { name: "阿澈" }
+  });
   const examples = Object.fromEntries(
     Object.entries(L.exampleCorpus).map(([carrier, entries]) => [carrier, entries.map(({ text }) => text)])
   );
@@ -203,10 +248,10 @@
   const intensityNames = ["low", "standard", "high"];
   const intensityLabels = ["轻度", "标准", "爆表"];
   const fontFamilies = {
-    song: 'Tahoma, "SimSun", "宋体", sans-serif',
-    kai: '"KaiTi", "楷体", serif',
-    hei: '"SimHei", "Microsoft YaHei", sans-serif',
-    rounded: '"YouYuan", "幼圆", "Microsoft YaHei", sans-serif'
+    song: 'SimSun, "宋体", NSimSun, "New Gulim", sans-serif',
+    kai: 'KaiTi, "楷体", serif',
+    hei: 'SimHei, "黑体", "Microsoft YaHei", sans-serif',
+    rounded: 'YouYuan, "幼圆", "Microsoft YaHei", sans-serif'
   };
   const copyIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="4" width="11" height="13" rx="2"></rect><rect x="4" y="8" width="11" height="12" rx="2"></rect></svg>';
 
@@ -256,15 +301,24 @@
     elements.intensityRange.setAttribute("aria-valuetext", intensityLabels[level]);
   }
 
+  function updateInterfaceLabels() {
+    if (activeCarrier === "chat") {
+      const friend = friends[pages.chat.persona] || friends.daily;
+      elements.taskTitle.textContent = `与「${friend.name}」聊天中`;
+    } else if (activeCarrier === "signature") {
+      elements.taskTitle.textContent = "正在制作个性签名";
+    } else {
+      elements.taskTitle.textContent = "正在生成网名候选";
+    }
+    elements.profileSignatureText.textContent = pages.signature.result || "编辑个性签名";
+  }
+
   function applyAppearance() {
     const appearance = pages[activeCarrier].appearance;
     const font = fontFamilies[appearance.font] || fontFamilies.song;
     elements.output.style.setProperty("--preview-font", font);
     elements.output.style.setProperty("--preview-size", `${appearance.size}px`);
     elements.output.style.setProperty("--preview-color", appearance.color);
-    elements.input.style.setProperty("--preview-font", font);
-    elements.input.style.setProperty("--preview-size", `${appearance.size}px`);
-    elements.input.style.setProperty("--preview-color", appearance.color);
     elements.font.value = appearance.font;
     elements.size.value = String(appearance.size);
     document.querySelectorAll("[data-color]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.color === appearance.color)));
@@ -283,7 +337,7 @@
       source.className = "chat-message is-source";
       const sourceMeta = document.createElement("div");
       sourceMeta.className = "message-meta";
-      sourceMeta.textContent = `莪  ${item.time}`;
+      sourceMeta.textContent = `逆光の旅人  ${item.time}`;
       const sourceText = document.createElement("p");
       sourceText.textContent = item.source;
       source.append(sourceMeta, sourceText);
@@ -292,7 +346,7 @@
       translated.className = "chat-message is-translated";
       const translatedMeta = document.createElement("div");
       translatedMeta.className = "message-meta";
-      translatedMeta.textContent = `${L.personaVoices[item.persona].label}  ${item.time}`;
+      translatedMeta.textContent = `${(friends[item.persona] || friends.daily).name}  ${item.time}`;
       const translatedBody = document.createElement("div");
       translatedBody.className = "translated-body";
       const translatedText = document.createElement("p");
@@ -318,15 +372,13 @@
     card.className = "signature-result";
     const label = document.createElement("span");
     label.className = "signature-label";
-    label.textContent = "QQ个性签名";
+    label.textContent = "个性签名";
     const text = document.createElement("p");
     text.textContent = result;
     card.append(label, text);
     stage.appendChild(card);
     preview.append(heading, stage);
     elements.output.appendChild(preview);
-    elements.activeCopy.hidden = false;
-    elements.activeCopy.dataset.copyValue = result;
   }
 
   function renderNicknames() {
@@ -363,13 +415,21 @@
 
   function renderActivePage() {
     elements.output.querySelectorAll(".chat-thread, .signature-preview, .nickname-grid").forEach((node) => node.remove());
-    elements.output.className = `output-area mode-${activeCarrier}`;
+    elements.output.className = `output-area region-l2 mode-${activeCarrier}`;
     elements.activeCopy.hidden = true;
     delete elements.activeCopy.dataset.copyValue;
     elements.empty.hidden = hasResults(activeCarrier);
     if (activeCarrier === "chat") renderChat();
     if (activeCarrier === "signature") renderSignature();
     if (activeCarrier === "nickname") renderNicknames();
+
+    const copyValue = activeCarrier === "chat"
+      ? pages.chat.history.at(-1)?.output
+      : activeCarrier === "signature" ? pages.signature.result : "";
+    if (copyValue) {
+      elements.activeCopy.hidden = false;
+      elements.activeCopy.dataset.copyValue = copyValue;
+    }
   }
 
   function restoreActivePage() {
@@ -388,6 +448,7 @@
     if (activeCarrier === "chat") elements.generate.textContent = "发送";
     if (activeCarrier === "signature") elements.generate.textContent = page.result ? "再生成" : "生成签名";
     if (activeCarrier === "nickname") elements.generate.textContent = page.results.length ? "换一批" : "生成网名";
+    updateInterfaceLabels();
     updateCounter();
     renderActivePage();
   }
@@ -441,6 +502,7 @@
     }
 
     updateCounter();
+    updateInterfaceLabels();
     renderActivePage();
     requestAnimationFrame(() => { elements.output.scrollTop = elements.output.scrollHeight; });
     elements.status.textContent = "翻译完成";
@@ -492,7 +554,10 @@
     activeCarrier = event.target.value;
     restoreActivePage();
   }));
-  document.querySelectorAll('input[name="persona"]').forEach((input) => input.addEventListener("change", saveCurrentPage));
+  document.querySelectorAll('input[name="persona"]').forEach((input) => input.addEventListener("change", () => {
+    saveCurrentPage();
+    updateInterfaceLabels();
+  }));
   elements.intensityRange.addEventListener("input", () => { updateSignalMeter(); saveCurrentPage(); });
   document.querySelectorAll(".editor-tool").forEach((button) => button.addEventListener("click", () => toggleToolPanel(button)));
   document.querySelectorAll("[data-insert]").forEach((button) => button.addEventListener("click", () => {
@@ -528,6 +593,14 @@
   });
   elements.activeCopy.addEventListener("click", () => {
     if (elements.activeCopy.dataset.copyValue) copyText(elements.activeCopy.dataset.copyValue);
+  });
+  elements.profileSignatureButton.addEventListener("click", () => {
+    const signature = document.querySelector('input[name="carrier"][value="signature"]');
+    if (!signature.checked) {
+      signature.checked = true;
+      signature.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    elements.input.focus();
   });
 
   restoreActivePage();

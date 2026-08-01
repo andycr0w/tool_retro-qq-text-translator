@@ -3,142 +3,177 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="把普通中文翻译成 2006–2012 年 QQ 聊天、个性签名和非主流网名。">
-  <title>莪の发言翻译器</title>
+  <meta name="description" content="把普通中文翻译成聊天发言、个性签名和非主流网名。">
+  <title>火星文翻译器</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="home-teleport" href="https://andycr0w.github.io/">← AndyCrow Home</a>
-  <div class="desktop-grain" aria-hidden="true"></div>
   <main class="page-shell">
-    <header class="site-intro">
-      <p class="year-stamp">2006—2012 / QQ MEMORY</p>
-      <h1><span>莪</span>の发言翻译器</h1>
-    </header>
-
     <section class="qq-window" aria-labelledby="window-title">
       <div class="qq-titlebar">
-        <div class="qq-mark" aria-hidden="true"><span>Q</span></div>
-        <div class="title-copy">
-          <strong id="window-title">与「火星翻译官」交谈中</strong>
-          <span>莪の世界，伱卟懂</span>
+        <div class="qq-title-left">
+          <span class="app-mark" aria-hidden="true">火</span>
+          <strong id="window-title">火星文翻译器</strong>
         </div>
-        <div class="window-actions" aria-hidden="true"><span>—</span><span>□</span><span>×</span></div>
-      </div>
-
-      <div class="qq-toolbar" aria-label="连接状态">
-        <span class="online-dot"></span>
-        <strong id="connection-status">在线</strong>
-        <span class="toolbar-separator"></span>
-        <span>QQ 2006 怀旧线路</span>
-        <span class="toolbar-time" id="toolbar-time">23:59</span>
+        <div class="window-actions" aria-hidden="true">
+          <span class="minimize">_</span>
+          <span class="maximize">□</span>
+          <span class="close">×</span>
+        </div>
       </div>
 
       <div class="workspace">
-        <section class="conversation-panel" aria-label="消息与生成结果">
-          <div class="output-area" id="output-area" aria-live="polite">
+        <section class="left-pane" aria-label="翻译工作区">
+          <header class="task-header region-l1">
+            <div class="task-heading">
+              <span class="task-bubble" aria-hidden="true"></span>
+              <strong id="task-title">与「阿澈」聊天中</strong>
+            </div>
+            <span class="task-product">火星文翻译器</span>
+          </header>
+
+          <div class="output-area region-l2 mode-chat" id="output-area" aria-live="polite">
             <div class="empty-state" id="empty-state">
               <span class="empty-avatar" aria-hidden="true">火</span>
               <div>
                 <strong id="empty-title">等待一条地球消息</strong>
-                <p id="empty-copy">写下原文，翻译官会把它送回 2008 年。</p>
+                <p id="empty-copy">写下一句话，和火星翻译官聊聊。</p>
               </div>
             </div>
           </div>
-          <div class="output-hint">
-            <span>提示：按 Ctrl + Enter 也可以翻译</span>
-            <button class="copy-icon-button" id="active-copy-button" type="button" aria-label="复制签名结果" title="复制结果" hidden>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="4" width="11" height="13" rx="2"></rect><rect x="4" y="8" width="11" height="12" rx="2"></rect></svg>
-            </button>
-          </div>
+
+          <form class="composer" id="translator-form">
+            <div class="editor-toolbar region-l3" role="toolbar" aria-label="编辑与结果工具">
+              <div class="editor-tools">
+                <button class="editor-tool font-tool" type="button" data-tool="appearance" aria-expanded="false" aria-controls="appearance-panel" title="字体、字号和颜色">A</button>
+                <button class="editor-tool" type="button" data-tool="emoji" aria-expanded="false" aria-controls="emoji-panel" title="颜文字">☺</button>
+                <button class="editor-tool" type="button" data-tool="symbol" aria-expanded="false" aria-controls="symbol-panel" title="特殊符号">✦</button>
+              </div>
+              <div class="result-tools">
+                <button class="tiny-glass-button" type="button" id="example-button">来个例子</button>
+                <button class="copy-icon-button" id="active-copy-button" type="button" aria-label="复制当前结果" title="复制当前结果" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="4" width="11" height="13" rx="2"></rect><rect x="4" y="8" width="11" height="12" rx="2"></rect></svg>
+                </button>
+              </div>
+
+              <div class="tool-panel appearance-panel" id="appearance-panel" data-panel="appearance" hidden>
+                <label>字体
+                  <select id="appearance-font">
+                    <option value="song">宋体</option><option value="kai">楷体</option><option value="hei">黑体</option><option value="rounded">圆体</option>
+                  </select>
+                </label>
+                <label>字号
+                  <select id="appearance-size">
+                    <option value="14" selected>14</option><option value="16">16</option><option value="18">18</option><option value="22">22</option>
+                  </select>
+                </label>
+                <div class="color-picker" aria-label="文字颜色">
+                  <button type="button" data-color="#000000" aria-label="黑色" style="--swatch:#000000"></button>
+                  <button type="button" data-color="#176aa2" aria-label="蓝色" style="--swatch:#176aa2"></button>
+                  <button type="button" data-color="#9b3677" aria-label="紫红色" style="--swatch:#9b3677"></button>
+                  <button type="button" data-color="#6c3ba5" aria-label="紫色" style="--swatch:#6c3ba5"></button>
+                </div>
+              </div>
+              <div class="tool-panel insert-grid emoji-grid" id="emoji-panel" data-panel="emoji" hidden>
+                <button type="button" data-insert="^_^">^_^</button><button type="button" data-insert="= =">= =</button><button type="button" data-insert=">3<">&gt;3&lt;</button><button type="button" data-insert="T_T">T_T</button><button type="button" data-insert="-_-!">-_-!</button><button type="button" data-insert="0.0">0.0</button>
+                <button type="button" data-insert="=3=">=3=</button><button type="button" data-insert=">_<">&gt;_&lt;</button><button type="button" data-insert=">﹏<">&gt;﹏&lt;</button><button type="button" data-insert="ToT">ToT</button><button type="button" data-insert="Q_Q">Q_Q</button><button type="button" data-insert="O(∩_∩)O">O(∩_∩)O</button>
+                <button type="button" data-insert="(*^__^*)">(*^__^*)</button><button type="button" data-insert="(⊙o⊙)">(⊙o⊙)</button><button type="button" data-insert="(╯﹏╰）">(╯﹏╰）</button><button type="button" data-insert="╮(╯▽╰)╭">╮(╯▽╰)╭</button><button type="button" data-insert="o(╯□╰)o">o(╯□╰)o</button><button type="button" data-insert="╭(╯^╰)╮">╭(╯^╰)╮</button>
+                <button type="button" data-insert="(╥﹏╥)">(╥﹏╥)</button><button type="button" data-insert="(～￣▽￣)～">(～￣▽￣)～</button><button type="button" data-insert="(￣▽￣)ノ">(￣▽￣)ノ</button><button type="button" data-insert="(｀・ω・´)">(｀・ω・´)</button><button type="button" data-insert="(づ￣ ³￣)づ">(づ￣ ³￣)づ</button><button type="button" data-insert="（づ￣3￣）づ╭❤～">（づ￣3￣）づ╭❤～</button>
+                <button type="button" data-insert="づ﹏ど">づ﹏ど</button><button type="button" data-insert="囧">囧</button><button type="button" data-insert="Orz">Orz</button><button type="button" data-insert="OTZ">OTZ</button><button type="button" data-insert="orz">orz</button><button type="button" data-insert="=￣ω￣=">=￣ω￣=</button>
+              </div>
+              <div class="tool-panel insert-grid symbol-grid" id="symbol-panel" data-panel="symbol" hidden>
+                <button type="button" data-insert="╭ァ">╭ァ</button><button type="button" data-insert="╰☆╮">╰☆╮</button><button type="button" data-insert="—━╋う">—━╋う</button><button type="button" data-insert="╃">╃</button><button type="button" data-insert="ぷ">ぷ</button><button type="button" data-insert="℅">℅</button>
+                <button type="button" data-insert="灬">灬</button><button type="button" data-insert="☆">☆</button><button type="button" data-insert="★">★</button><button type="button" data-insert="メ">メ</button><button type="button" data-insert="〆">〆</button><button type="button" data-insert="づ">づ</button>
+                <button type="button" data-insert="ㄣ">ㄣ</button><button type="button" data-insert="ゞ">ゞ</button><button type="button" data-insert="〃">〃</button><button type="button" data-insert="丶">丶</button><button type="button" data-insert="丿">丿</button><button type="button" data-insert="乄">乄</button>
+                <button type="button" data-insert="乀">乀</button><button type="button" data-insert="乁">乁</button><button type="button" data-insert="乂">乂</button><button type="button" data-insert="刂">刂</button><button type="button" data-insert="彡">彡</button><button type="button" data-insert="巛">巛</button>
+                <button type="button" data-insert="氵">氵</button><button type="button" data-insert="忄">忄</button><button type="button" data-insert="艹">艹</button><button type="button" data-insert="辶">辶</button><button type="button" data-insert="廴">廴</button><button type="button" data-insert="阝">阝</button>
+                <button type="button" data-insert="卩">卩</button><button type="button" data-insert="亽">亽</button><button type="button" data-insert="玍">玍</button><button type="button" data-insert="吢">吢</button><button type="button" data-insert="尛">尛</button><button type="button" data-insert="卍">卍</button>
+                <button type="button" data-insert="︶">︶</button><button type="button" data-insert="︵">︵</button><button type="button" data-insert="︷">︷</button><button type="button" data-insert="︸">︸</button><button type="button" data-insert="╭">╭</button><button type="button" data-insert="╮">╮</button>
+                <button type="button" data-insert="╯">╯</button><button type="button" data-insert="╰">╰</button><button type="button" data-insert="°">°</button><button type="button" data-insert="·">·</button><button type="button" data-insert="•">•</button><button type="button" data-insert="〣">〣</button>
+              </div>
+            </div>
+
+            <label class="sr-only" for="source-text">输入原文</label>
+            <textarea class="region-l4" id="source-text" maxlength="500" placeholder="在这里输入一句普通话..."></textarea>
+            <div class="composer-footer region-l5">
+              <span class="char-count" id="char-count">0 / 500</span>
+              <div class="footer-actions">
+                <button type="button" class="text-button" id="clear-button">清空</button>
+                <button type="submit" class="send-button" id="generate-button">发送</button>
+              </div>
+            </div>
+          </form>
         </section>
 
-        <aside class="settings-panel" aria-label="翻译设置">
-          <h2 class="settings-title">发到哪里</h2>
-          <div class="notebook-tabs" role="tablist" aria-label="发到哪里">
-            <label class="notebook-tab"><input type="radio" name="carrier" value="chat" checked><span>聊天发言</span></label>
-            <label class="notebook-tab"><input type="radio" name="carrier" value="signature"><span>个性签名</span></label>
-            <label class="notebook-tab"><input type="radio" name="carrier" value="nickname"><span>QQ网名</span></label>
-          </div>
-
-          <div class="notebook-page" id="notebook-page" role="tabpanel">
-            <fieldset class="control-group" id="persona-group">
-              <legend>空间人格</legend>
-              <div class="persona-list">
-                <label class="persona-card sorrow"><input type="radio" name="persona" value="sorrow"><span><b>伤感葬爱</b><small>伱永远卟会明白</small></span></label>
-                <label class="persona-card sweet"><input type="radio" name="persona" value="sweet"><span><b>甜蜜网恋</b><small>寶，要壹直陪莪</small></span></label>
-                <label class="persona-card cool"><input type="radio" name="persona" value="cool"><span><b>拽酷宣言</b><small>莪の世界无需解释</small></span></label>
-                <label class="persona-card daily"><input type="radio" name="persona" value="daily" checked><span><b>日常聊天</b><small>诶，就醬吖 = =</small></span></label>
+        <aside class="right-pane" aria-label="翻译设置">
+          <section class="profile-panel region-r1" aria-label="我的资料">
+            <span class="profile-avatar" aria-hidden="true"><i></i></span>
+            <div class="profile-copy">
+              <div class="profile-name-row">
+                <strong>逆光の旅人</strong>
+                <span class="online-badge"><i></i><span id="connection-status">在线</span></span>
               </div>
-            </fieldset>
+              <button class="profile-signature" id="profile-signature-button" type="button" title="制作个性签名">
+                <span id="profile-signature-text">编辑个性签名</span>
+              </button>
+            </div>
+          </section>
 
+          <section class="carrier-panel region-r2" aria-label="输出用途">
+            <div class="notebook-tabs" role="tablist" aria-label="输出用途">
+              <label class="notebook-tab"><input type="radio" name="carrier" value="chat" checked><span>聊天发言</span></label>
+              <label class="notebook-tab"><input type="radio" name="carrier" value="signature"><span>个性签名</span></label>
+              <label class="notebook-tab"><input type="radio" name="carrier" value="nickname"><span>网名候选</span></label>
+            </div>
+          </section>
+
+          <section class="settings-panel region-r3" id="notebook-page" aria-label="火星信号与聊天对象">
             <fieldset class="control-group intensity-group" id="intensity-group">
-              <legend>火星浓度</legend>
-              <div class="signal-slider" id="signal-slider">
-                <div class="signal-meter" id="signal-meter" data-level="1" aria-hidden="true">
-                  <i></i><i></i><i></i><i></i><i></i>
+              <legend>火星信号</legend>
+              <div class="signal-control">
+                <div class="signal-slider" id="signal-slider">
+                  <div class="signal-meter" id="signal-meter" data-level="1" aria-hidden="true">
+                    <i></i><i></i><i></i><i></i><i></i>
+                  </div>
+                  <input id="intensity-range" type="range" min="0" max="2" step="1" value="1" aria-label="火星浓度" aria-valuetext="标准">
                 </div>
-                <input id="intensity-range" type="range" min="0" max="2" step="1" value="1" aria-label="火星浓度" aria-valuetext="标准">
+                <div class="signal-labels" aria-hidden="true"><span>轻度</span><span>标准</span><span>爆表</span></div>
               </div>
             </fieldset>
-          </div>
-        </aside>
 
-        <form class="composer" id="translator-form">
-          <div class="editor-toolbar" role="toolbar" aria-label="编辑工具">
-            <button class="editor-tool font-tool" type="button" data-tool="appearance" aria-expanded="false" aria-controls="appearance-panel" title="字体和颜色">A</button>
-            <button class="editor-tool" type="button" data-tool="emoji" aria-expanded="false" aria-controls="emoji-panel" title="颜文字">☺</button>
-            <button class="editor-tool" type="button" data-tool="symbol" aria-expanded="false" aria-controls="symbol-panel" title="特殊符号">✦</button>
-            <button class="editor-tool" type="button" data-tool="music" aria-expanded="false" aria-controls="music-panel" title="音乐状态">♫</button>
-
-            <div class="tool-panel appearance-panel" id="appearance-panel" data-panel="appearance" hidden>
-              <label>字体
-                <select id="appearance-font">
-                  <option value="song">宋体</option><option value="kai">楷体</option><option value="hei">黑体</option><option value="rounded">圆体</option>
-                </select>
-              </label>
-              <label>字号
-                <select id="appearance-size">
-                  <option value="14">14</option><option value="16" selected>16</option><option value="18">18</option><option value="22">22</option>
-                </select>
-              </label>
-              <div class="color-picker" aria-label="文字颜色">
-                <button type="button" data-color="#202830" aria-label="黑色" style="--swatch:#202830"></button>
-                <button type="button" data-color="#176aa2" aria-label="蓝色" style="--swatch:#176aa2"></button>
-                <button type="button" data-color="#9b3677" aria-label="紫红色" style="--swatch:#9b3677"></button>
-                <button type="button" data-color="#6c3ba5" aria-label="紫色" style="--swatch:#6c3ba5"></button>
+            <fieldset class="control-group persona-group" id="persona-group">
+              <legend>选择聊天对象</legend>
+              <div class="persona-list">
+                <label class="persona-card translator">
+                  <input type="radio" name="persona" value="translator" checked>
+                  <span><i class="friend-avatar" aria-hidden="true"><em></em></i><b>火星文翻译官</b><small>任何情感、都能翻成可讀火星文。</small><u>在线</u></span>
+                </label>
+                <label class="persona-card sorrow">
+                  <input type="radio" name="persona" value="sorrow">
+                  <span><i class="friend-avatar" aria-hidden="true"><em></em></i><b>葬花♀涙</b><small>原來、離開也是一種成全。</small><u>在线</u></span>
+                </label>
+                <label class="persona-card sweet">
+                  <input type="radio" name="persona" value="sweet">
+                  <span><i class="friend-avatar" aria-hidden="true"><em></em></i><b>糖糖ゞ</b><small>寶、說好要壹直陪莪。</small><u>在线</u></span>
+                </label>
+                <label class="persona-card cool">
+                  <input type="radio" name="persona" value="cool">
+                  <span><i class="friend-avatar" aria-hidden="true"><em></em></i><b>冷瞳╮</b><small>莪の世界、無需誰來定義。</small><u>在线</u></span>
+                </label>
+                <label class="persona-card daily">
+                  <input type="radio" name="persona" value="daily">
+                  <span><i class="friend-avatar" aria-hidden="true"><em></em></i><b>阿澈</b><small>誒，就醬吖 = =</small><u>在线</u></span>
+                </label>
               </div>
-            </div>
-            <div class="tool-panel insert-grid" id="emoji-panel" data-panel="emoji" hidden>
-              <button type="button" data-insert="^_^">^_^</button><button type="button" data-insert="= =">= =</button><button type="button" data-insert=">3<">&gt;3&lt;</button><button type="button" data-insert="づ﹏ど">づ﹏ど</button><button type="button" data-insert="(づ￣ ³￣)づ">(づ￣ ³￣)づ</button><button type="button" data-insert="Orz">Orz</button>
-            </div>
-            <div class="tool-panel insert-grid" id="symbol-panel" data-panel="symbol" hidden>
-              <button type="button" data-insert="╭ァ">╭ァ</button><button type="button" data-insert="灬">灬</button><button type="button" data-insert="☆">☆</button><button type="button" data-insert="メ">メ</button><button type="button" data-insert="〆">〆</button><button type="button" data-insert="づ">づ</button><button type="button" data-insert="╰☆╮">╰☆╮</button><button type="button" data-insert="—━╋う">—━╋う</button>
-            </div>
-            <div class="tool-panel music-panel" id="music-panel" data-panel="music" hidden>
-              <button type="button" data-insert="♫ 正在聽：周杰倫 - 夜曲">♫ 正在聽：周杰倫 - 夜曲</button>
-              <button type="button" data-insert="♪ 單曲循環中…">♪ 單曲循環中…</button>
-              <button type="button" data-insert="♫ 音樂陪着莪">♫ 音樂陪着莪</button>
-            </div>
-          </div>
-          <label class="sr-only" for="source-text">输入原文</label>
-          <textarea id="source-text" maxlength="500" placeholder="在这里输入一句普通话…"></textarea>
-          <div class="composer-footer">
-            <span class="char-count" id="char-count">0 / 500</span>
-            <div class="secondary-actions">
-              <button type="button" class="text-button" id="example-button">来个例子</button>
-              <button type="button" class="text-button" id="clear-button">清空</button>
-            </div>
-            <button type="submit" class="send-button" id="generate-button">开始翻译</button>
-          </div>
-        </form>
+            </fieldset>
+          </section>
+        </aside>
       </div>
     </section>
-    <footer class="site-footer">纯浏览器运行 <span>·</span> 无账号 <span>·</span> 无 API</footer>
   </main>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="vocabulary.js"></script>
-  <script src="app.js"></script>
-  <script>document.getElementById("toolbar-time").textContent = new Date().toLocaleTimeString("zh-CN", {hour:"2-digit", minute:"2-digit"});</script>
+  <script src="vocabulary.js?v=translator-friend"></script>
+  <script src="app.js?v=translator-friend"></script>
 </body>
 </html>
