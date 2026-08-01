@@ -101,8 +101,42 @@ textarea:focus-visible {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding-left: 8px;
+  gap: 6px;
+  padding-left: 6px;
+}
+
+.title-back {
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, .62);
+  border-radius: 3px;
+  color: #ffffff;
+  background: rgba(15, 101, 153, .18);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .34);
+  text-decoration: none;
+}
+
+.title-back:hover {
+  border-color: rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, .22);
+}
+
+.title-back:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
+}
+
+.title-back svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .qq-title-left strong {
