@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>火星文翻译器</title>
+  <rect width="64" height="64" rx="14" fill="#2187c5"/>
+  <path d="M9 17h39v27H28l-10 9v-9H9V17Z" fill="#f8ffff" stroke="#176b9d" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="17" y="27" width="5" height="5" fill="#176b9d"/>
+  <path d="m27 31 4-4 4 4 4-4" fill="none" stroke="#176b9d" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter"/>
+  <path d="M51 8v6M48 11h6M53 18v4M51 20h4" fill="none" stroke="#fff3c4" stroke-width="3" stroke-linecap="square"/>
+</svg>
